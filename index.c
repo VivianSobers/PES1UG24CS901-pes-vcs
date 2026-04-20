@@ -37,7 +37,7 @@ IndexEntry* index_find(Index *index, const char *path) {
     }
     return NULL;
 }
-
+ 
 // Remove a file from the index.
 // Returns 0 on success, -1 if path not in index.
 int index_remove(Index *index, const char *path) {
