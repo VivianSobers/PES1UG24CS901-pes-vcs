@@ -1,27 +1,32 @@
-# PES1UG24CS901 — PES-VCS: Building a Version Control System
+# PES-VCS — Version Control System
 
-**Name:** Vivian Sobers  
-**SRN:** PES1UG24CS901  
-**Class:** 4 'C'  
+![Language](https://img.shields.io/badge/Language-C-D97706?style=for-the-badge&labelColor=92400E)
+![Crypto](https://img.shields.io/badge/Crypto-SHA--256%20%7C%20OpenSSL-0F766E?style=for-the-badge&labelColor=134E4A)
+![Build](https://img.shields.io/badge/Build-Passing-DC2626?style=for-the-badge&labelColor=7F1D1D)
+![Phases](https://img.shields.io/badge/Phases-4%2F4%20Complete-9333EA?style=for-the-badge&labelColor=581C87)
+![Tests](https://img.shields.io/badge/Tests-Passing-1F2937?style=for-the-badge&labelColor=000000)
+![Storage](https://img.shields.io/badge/Storage-Content--Addressable-2563EB?style=for-the-badge&labelColor=1E3A8A)
+
+**Name:** Vivian Sobers E
+**SRN:** PES1UG24CS901
+**Class:** 4 'C'
 
 ---
 
-## Overview
-
-PES-VCS is a simplified version control system built from scratch in C, modeled after Git's internal design. It implements content-addressable object storage, a staging area, tree objects, and a commit history chain — all using core operating system and filesystem concepts.
+> A simplified Git-inspired VCS built from scratch in C — implementing content-addressable object storage, a staging area, tree objects, and a commit history chain using core OS and filesystem concepts.
 
 ---
 
-## Building
+## Building & Usage
 
 ```bash
+# Install dependencies
 sudo apt update && sudo apt install -y gcc build-essential libssl-dev
+
 make          # Build the pes binary
 make all      # Build pes + test binaries
 make clean    # Remove all build artifacts
 ```
-
-## Usage
 
 ```bash
 export PES_AUTHOR="Your Name <your@email.com>"
@@ -36,14 +41,15 @@ export PES_AUTHOR="Your Name <your@email.com>"
 
 ## Phase 1 — Object Storage Foundation
 
-**Concepts:** Content-addressable storage, directory sharding, atomic writes, SHA-256 hashing
-
-**Files implemented:** `object.c`
+**File:** `object.c`
+**Concepts:** `content-addressable storage` · `directory sharding` · `atomic writes` · `SHA-256 hashing`
 
 ### What was implemented
 
-- **`object_write`** — Prepends a type header (`"blob <size>\0"`), computes SHA-256 of the full object, checks for deduplication, creates the shard directory, writes to a temp file, fsyncs, then atomically renames to the final path.
-- **`object_read`** — Reads the object file, recomputes the SHA-256 and compares it to the filename to verify integrity, parses the type header, and returns the raw data.
+| Function | Description |
+|---|---|
+| `object_write` | Prepends a type header (`"blob <size>\0"`), computes SHA-256 of the full object, checks for deduplication, creates the shard directory, writes to a temp file, fsyncs, then atomically renames to the final path. |
+| `object_read` | Reads the object file, recomputes the SHA-256 and compares it to the filename to verify integrity, parses the type header, and returns the raw data. |
 
 ### Testing
 
@@ -67,15 +73,16 @@ find .pes/objects -type f
 
 ## Phase 2 — Tree Objects
 
-**Concepts:** Directory representation, recursive structures, file modes and permissions
-
-**Files implemented:** `tree.c`
+**File:** `tree.c`
+**Concepts:** `directory representation` · `recursive structures` · `file modes and permissions`
 
 ### What was implemented
 
-- **`tree_parse`** — Parses the binary tree format (`"<mode> <name>\0<32-byte-hash>"`) into a `Tree` struct entry by entry using `memchr` for safe boundary checking.
-- **`tree_serialize`** — Sorts entries by name (required for deterministic hashing), then writes each entry in binary format using `sprintf` for the mode/name and `memcpy` for the raw hash bytes.
-- **`tree_from_index`** — Loads the index and recursively builds a tree hierarchy using `write_tree_level`, which groups entries by their first path component — flat files become blob entries and nested paths trigger recursion to build subtrees.
+| Function | Description |
+|---|---|
+| `tree_parse` | Parses the binary tree format (`"<mode> <name>\0<32-byte-hash>"`) into a `Tree` struct entry by entry using `memchr` for safe boundary checking. |
+| `tree_serialize` | Sorts entries by name (required for deterministic hashing), then writes each entry in binary format using `sprintf` for the mode/name and `memcpy` for the raw hash bytes. |
+| `tree_from_index` | Loads the index and recursively builds a tree hierarchy using `write_tree_level`, which groups entries by their first path component — flat files become blob entries and nested paths trigger recursion to build subtrees. |
 
 ### Testing
 
@@ -99,17 +106,18 @@ xxd .pes/objects/XX/YYYY... | head -20
 
 ---
 
-## Phase 3 — Index (Staging Area)
+## Phase 3 — Index / Staging Area
 
-**Concepts:** File format design, atomic writes, change detection using mtime and size
-
-**Files implemented:** `index.c`
+**File:** `index.c`
+**Concepts:** `file format design` · `atomic writes` · `change detection using mtime and size`
 
 ### What was implemented
 
-- **`index_load`** — Reads `.pes/index` line by line using `fscanf`, parsing `<mode> <hex-hash> <mtime> <size> <path>`. Returns an empty index if the file doesn't exist yet.
-- **`index_save`** — Sorts entries by path using `qsort`, writes to a temp file, calls `fflush` + `fsync` to ensure durability, then atomically renames to `.pes/index`.
-- **`index_add`** — Reads the file contents, writes them as a blob via `object_write`, captures metadata (`mtime`, `size`, `mode`) via `lstat`, then upserts the entry in the index.
+| Function | Description |
+|---|---|
+| `index_load` | Reads `.pes/index` line by line using `fscanf`, parsing `<mode> <hex-hash> <mtime> <size> <path>`. Returns an empty index if the file doesn't exist yet. |
+| `index_save` | Sorts entries by path using `qsort`, writes to a temp file, calls `fflush` + `fsync` to ensure durability, then atomically renames to `.pes/index`. |
+| `index_add` | Reads the file contents, writes them as a blob via `object_write`, captures metadata (`mtime`, `size`, `mode`) via `lstat`, then upserts the entry in the index. |
 
 ### Testing
 
@@ -136,16 +144,17 @@ cat .pes/index
 
 ---
 
-## Phase 4 — Commits and History
+## Phase 4 — Commits & History
 
-**Concepts:** Linked structures on disk, reference files, atomic pointer updates
-
-**Files implemented:** `commit.c`, `pes.c`
+**Files:** `commit.c`, `pes.c`
+**Concepts:** `linked structures on disk` · `reference files` · `atomic pointer updates`
 
 ### What was implemented
 
-- **`commit_create`** — Calls `tree_from_index` to snapshot the staged state, reads HEAD as the parent commit (skipped for the first commit), fills the `Commit` struct with author, timestamp and message, serializes it, writes it as an object, then atomically updates the branch ref via `head_update`.
-- **`cmd_commit`** in `pes.c` — Parses `-m <message>` from command-line arguments, calls `commit_create`, and prints the first 12 hex characters of the new commit hash.
+| Function | Description |
+|---|---|
+| `commit_create` | Calls `tree_from_index` to snapshot the staged state, reads HEAD as the parent commit (skipped for the first commit), fills the `Commit` struct with author, timestamp and message, serializes it, writes it as an object, then atomically updates the branch ref via `head_update`. |
+| `cmd_commit` | Parses `-m <message>` from command-line arguments, calls `commit_create`, and prints the first 12 hex characters of the new commit hash. |
 
 ### Testing
 
@@ -175,7 +184,6 @@ cat .pes/HEAD
 
 ![4BC](screenshots/4BC.png)
 
-
 ---
 
 ## Final Integration Test
@@ -192,11 +200,9 @@ make test-integration
 
 ---
 
-## Analysis Questions
+## Q5 — Branching & Checkout
 
-### Q5 — Branching and Checkout
-
-**Q5.1 — How would you implement `pes checkout <branch>`?**
+### Q5.1 — How would you implement `pes checkout <branch>`?
 
 To switch branches, three things need to change in `.pes/`:
 
@@ -208,7 +214,7 @@ What makes this complex is handling files that exist in the current branch but n
 
 ---
 
-**Q5.2 — How would you detect a dirty working directory conflict?**
+### Q5.2 — How would you detect a dirty working directory conflict?
 
 Before switching, for every file in the index:
 
@@ -220,7 +226,7 @@ If either condition is true for any file that also differs between the two branc
 
 ---
 
-**Q5.3 — What happens in detached HEAD state?**
+### Q5.3 — What happens in detached HEAD state?
 
 When HEAD contains a commit hash directly instead of a branch reference, new commits are written and HEAD is updated to the new hash — but no branch pointer moves. This means once you switch away, those commits become unreachable from any branch.
 
@@ -232,9 +238,9 @@ In PES-VCS without a reflog, recovery would require manually scanning `.pes/obje
 
 ---
 
-### Q6 — Garbage Collection
+## Q6 — Garbage Collection
 
-**Q6.1 — Algorithm to find and delete unreachable objects**
+### Q6.1 — Algorithm to find and delete unreachable objects
 
 Use a **mark and sweep** approach:
 
@@ -255,7 +261,7 @@ For a repository with 100,000 commits and 50 branches, assuming an average of 50
 
 ---
 
-**Q6.2 — Race condition between GC and concurrent commit**
+### Q6.2 — Race condition between GC and concurrent commit
 
 The race condition scenario:
 
@@ -274,4 +280,4 @@ Git uses a **grace period** — GC never deletes objects newer than 2 weeks old 
 
 ## Author
 
-Vivian Sobers E
+**Vivian Sobers E** · PES1UG24CS901 · Class 4 'C' · PES University
