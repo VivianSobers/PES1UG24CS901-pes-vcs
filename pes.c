@@ -93,7 +93,7 @@ static void log_callback(const ObjectID *id, const Commit *c, void *ctx) {
     printf("commit %s\nAuthor: %s\nDate:   %s\n\n    %s\n\n",
            hex, c->author, date_buf, c->message);
 }
-
+ 
 void cmd_log(void) {
     if (commit_walk(log_callback, NULL) != 0)
         fprintf(stderr, "error: no commits yet (or failed to walk history)\n");
