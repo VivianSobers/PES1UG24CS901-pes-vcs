@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
-
+ 
 // Forward declarations
 int commit_walk(commit_walk_fn callback, void *ctx);
 
