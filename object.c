@@ -204,7 +204,7 @@ int object_read(const ObjectID *id, ObjectType *type_out, void **data_out, size_
         free(buf);
         return -1;
     }
-
+ 
     // 6. Extract data portion (everything after the '\0')
     size_t header_len = (size_t)(null_pos - buf);
     size_t data_len   = (size_t)file_size - header_len - 1;
