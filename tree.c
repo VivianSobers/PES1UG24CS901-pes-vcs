@@ -53,7 +53,7 @@ int tree_parse(const void *data, size_t len, Tree *tree_out) {
         memcpy(mode_str, ptr, mode_len);
         entry->mode = strtol(mode_str, NULL, 8);
         ptr = space + 1;
-
+ 
         const uint8_t *null_byte = memchr(ptr, '\0', end - ptr);
         if (!null_byte) return -1;
         size_t name_len = null_byte - ptr;
