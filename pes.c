@@ -45,7 +45,7 @@ void cmd_add(int argc, char *argv[]) {
             printf("Added: %s\n", argv[i]);
     }
     free(index);
-}
+} 
 
 // ─── status ──────────────────────────────────────────────────────────────────
 
