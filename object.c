@@ -42,7 +42,7 @@ void compute_hash(const void *data, size_t len, ObjectID *id_out) {
     SHA256_Update(&ctx, data, len);
     SHA256_Final(id_out->hash, &ctx);
 }
-
+ 
 // Get the filesystem path where an object should be stored.
 // Format: .pes/objects/XX/YYYYYYYY...
 // The first 2 hex chars form the shard directory; the rest is the filename.
