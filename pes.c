@@ -79,7 +79,7 @@ void cmd_commit(int argc, char *argv[]) {
     hash_to_hex(&commit_id, hex);
     printf("Committed: %.12s... %s\n", hex, message);
 }
-
+ 
 // ─── log ─────────────────────────────────────────────────────────────────────
 
 static void log_callback(const ObjectID *id, const Commit *c, void *ctx) {
