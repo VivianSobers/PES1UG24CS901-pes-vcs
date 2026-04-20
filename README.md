@@ -167,10 +167,11 @@ cat .pes/HEAD
 
 **Screenshot 4A — `pes log` showing 3 commits**
 
-![4A](screenshots/4A.jpg)
+![4A](screenshots/4A.png)
 
-**Screenshot 4B — Object store growth after 3 commits
-Screenshot 4C — Reference chain (HEAD → branch → commit)**
+**Screenshot 4B — Object store growth after 3 commits**
+
+**Screenshot 4C — Reference chain (HEAD → branch → commit)**
 
 ![4BC](screenshots/4BC.png)
 
