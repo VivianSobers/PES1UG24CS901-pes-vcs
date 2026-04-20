@@ -61,7 +61,7 @@ int tree_parse(const void *data, size_t len, Tree *tree_out) {
         memcpy(entry->name, ptr, name_len);
         entry->name[name_len] = '\0';
         ptr = null_byte + 1;
-
+ 
         if (ptr + HASH_SIZE > end) return -1;
         memcpy(entry->hash.hash, ptr, HASH_SIZE);
         ptr += HASH_SIZE;
